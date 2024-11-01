@@ -27,6 +27,6 @@ module "talos" {
   control_plane_server_type = "cx22"
 
   # Pas de support de pool de serveurs pour les workers...
-  worker_count       = 3
+  worker_count       = 2
   worker_server_type = "cx22"
 }
