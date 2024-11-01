@@ -21,7 +21,7 @@ module "talos" {
   firewall_use_current_ip = true
   hcloud_token            = var.hcloud_token
 
-  datacenter_name = "fsn1-dc14"
+  datacenter_name = "nbg1-dc3"
 
   control_plane_count       = 1
   control_plane_server_type = "cx22"
@@ -29,4 +29,14 @@ module "talos" {
   # Pas de support de pool de serveurs pour les workers...
   worker_count       = 2
   worker_server_type = "cx22"
+}
+
+output "talosconfig" {
+  value     = module.talos.talosconfig
+  sensitive = true
+}
+
+output "kubeconfig" {
+  value     = module.talos.kubeconfig
+  sensitive = true
 }
