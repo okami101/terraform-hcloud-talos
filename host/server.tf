@@ -14,7 +14,7 @@ resource "hcloud_server" "server" {
   name         = var.name
   server_type  = var.type
   location     = var.location
-  image        = substr(var.type, 0, 3) == "cax" ? data.hcloud_image.talos_x86_snapshot.id : data.hcloud_image.talos_arm_snapshot.id
+  image        = substr(var.type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
   firewall_ids = var.hcloud_firewall_ids
   lifecycle {
     ignore_changes = [
