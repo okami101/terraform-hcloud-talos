@@ -1,42 +1,69 @@
-terraform {
-  required_providers {
-    hcloud = {
-      source = "hetznercloud/hcloud"
+locals {
+  network_ipv4_subnets = [
+    for index in range(256) : cidrsubnet(var.network_ipv4_cidr, 8, index)
+  ]
+  firewall_rules = concat(
+    var.firewall_talos_api_source == null ? [] : [
+      {
+        description = "Allow Incoming Talos API Traffic"
+        direction   = "in"
+        protocol    = "tcp"
+        port        = "50000"
+        source_ips  = var.firewall_talos_api_source
+      },
+    ],
+    var.firewall_kube_api_source == null ? [] : [
+      {
+        description = "Allow Incoming Requests to Kube API Server"
+        direction   = "in"
+        protocol    = "tcp"
+        port        = "6443"
+        source_ips  = var.firewall_kube_api_source
+      }
+    ],
+    [
+      {
+        description = "Allow Incoming ICMP Ping Requests"
+        direction   = "in"
+        protocol    = "icmp"
+        port        = ""
+        source_ips  = ["0.0.0.0/0", "::/0"]
+      }
+    ]
+  )
+}
+
+resource "hcloud_network" "k3s" {
+  name     = var.cluster_name
+  ip_range = var.network_ipv4_cidr
+}
+
+resource "hcloud_network_subnet" "control_plane" {
+  network_id   = hcloud_network.k3s.id
+  type         = "cloud"
+  network_zone = var.network_zone
+  ip_range     = local.network_ipv4_subnets[255]
+}
+
+resource "hcloud_network_subnet" "agent" {
+  count        = length(var.agent_nodepools)
+  network_id   = hcloud_network.k3s.id
+  type         = "cloud"
+  network_zone = var.network_zone
+  ip_range     = local.network_ipv4_subnets[count.index]
+}
+
+resource "hcloud_firewall" "k3s" {
+  name = var.cluster_name
+
+  dynamic "rule" {
+    for_each = local.firewall_rules
+    content {
+      description = rule.value.description
+      direction   = rule.value.direction
+      protocol    = rule.value.protocol
+      port        = rule.value.port
+      source_ips  = rule.value.source_ips
     }
   }
-}
-
-provider "hcloud" {
-  token = var.hcloud_token
-}
-
-module "talos" {
-  source  = "hcloud-talos/talos/hcloud"
-  version = "2.11.9"
-
-  cluster_name     = "okami-talos"
-  talos_version    = "v1.8.2"
-  cluster_api_host = "talos.okami101.io"
-
-  firewall_use_current_ip = true
-  hcloud_token            = var.hcloud_token
-
-  datacenter_name = "nbg1-dc3"
-
-  control_plane_count       = 1
-  control_plane_server_type = "cx22"
-
-  # Pas de support de pool de serveurs pour les workers...
-  worker_count       = 2
-  worker_server_type = "cx22"
-}
-
-output "talosconfig" {
-  value     = module.talos.talosconfig
-  sensitive = true
-}
-
-output "kubeconfig" {
-  value     = module.talos.kubeconfig
-  sensitive = true
 }
