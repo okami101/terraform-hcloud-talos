@@ -28,27 +28,27 @@ data "talos_machine_configuration" "this" {
   config_patches     = each.value.config_patches
 }
 
-# resource "talos_machine_configuration_apply" "this" {
-#   for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
-#   client_configuration        = talos_machine_secrets.this.client_configuration
-#   machine_configuration_input = data.talos_machine_configuration.this.machine_configuration
-#   node                        = each.value.key
-#   config_patches              = each.value.config_patches
-# }
+resource "talos_machine_configuration_apply" "this" {
+  for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
+  client_configuration        = talos_machine_secrets.this.client_configuration
+  machine_configuration_input = data.talos_machine_configuration.this.machine_configuration
+  node                        = each.value.key
+  config_patches              = each.value.config_patches
+}
 
-# resource "talos_machine_bootstrap" "this" {
-#   client_configuration = talos_machine_secrets.this.client_configuration
-#   node                 = local.first_control_plane.public_ipv4
-#   endpoint             = local.first_control_plane.public_ipv4
-#   depends_on = [
-#     talos_machine_configuration_apply.this
-#   ]
-# }
+resource "talos_machine_bootstrap" "this" {
+  client_configuration = talos_machine_secrets.this.client_configuration
+  node                 = local.first_control_plane.public_ipv4
+  endpoint             = local.first_control_plane.public_ipv4
+  depends_on = [
+    talos_machine_configuration_apply.this
+  ]
+}
 
-# resource "talos_cluster_kubeconfig" "this" {
-#   client_configuration = talos_machine_secrets.this.client_configuration
-#   node                 = local.first_control_plane.public_ipv4
-#   depends_on = [
-#     talos_machine_bootstrap.this
-#   ]
-# }
+resource "talos_cluster_kubeconfig" "this" {
+  client_configuration = talos_machine_secrets.this.client_configuration
+  node                 = local.first_control_plane.public_ipv4
+  depends_on = [
+    talos_machine_bootstrap.this
+  ]
+}
