@@ -82,7 +82,10 @@ data "talos_machine_configuration" "this" {
   docs               = false
   examples           = false
   config_patches = [yamlencode({
-    machine = local.machine_config
+    machine = merge(local.machine_config, {
+      nodeLabels = each.value.labels
+      nodeTaints = each.value.taints
+    })
     cluster = local.config_patches["cluster_${each.value.machine_type}_config"]
   })]
 }
