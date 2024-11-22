@@ -100,7 +100,7 @@ locals {
             machine = merge(
               local.machine_config,
               {
-                disks = each.value.volume_size >= 10 ? [
+                disks = s.volume_size >= 10 ? [
                   {
                     device = "/dev/sdb"
                     partitions = [
