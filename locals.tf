@@ -103,16 +103,7 @@ locals {
             machine = merge(local.machine_config, {
               nodeLabels = s.labels != null ? s.labels : {}
               nodeTaints = s.taints != null ? s.taints : {}
-              disks = s.volume_size == null ? [] : [
-                {
-                  device = "/dev/sdb"
-                  partitions = [
-                    {
-                      mountpoint = "/var/mnt/longhorn"
-                    }
-                  ]
-                }
-              ]
+              disks      = []
             })
             cluster = local.config_patches["cluster_worker_config"]
           }
