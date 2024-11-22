@@ -3,6 +3,12 @@ variable "talos_version" {
   type        = string
 }
 
+variable "talos_endpoint" {
+  description = "The endpoint of the talos API. If not set, the first control plane public IP will be used."
+  type        = string
+  default     = null
+}
+
 variable "kubernetes_version" {
   description = "The version of kubernetes to use"
   type        = string

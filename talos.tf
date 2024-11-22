@@ -6,6 +6,7 @@ locals {
   cluster_internal_host     = "cluster.local"
   cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
   first_control_plane       = values(module.servers)[0]
+  cluster_endpoint          = var.talos_endpoint != null ? var.talos_endpoint : local.first_control_plane.public_ipv4
 }
 
 data "talos_client_configuration" "this" {
@@ -33,14 +34,14 @@ resource "talos_machine_configuration_apply" "this" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = each.value.private_ipv4
-  endpoint                    = local.first_control_plane.public_ipv4
+  endpoint                    = local.cluster_endpoint
   depends_on                  = [module.servers]
 }
 
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = local.first_control_plane.private_ipv4
-  endpoint             = local.first_control_plane.public_ipv4
+  endpoint             = local.cluster_endpoint
   depends_on = [
     talos_machine_configuration_apply.this
   ]
@@ -49,7 +50,7 @@ resource "talos_machine_bootstrap" "this" {
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = local.first_control_plane.private_ipv4
-  endpoint             = local.first_control_plane.public_ipv4
+  endpoint             = local.cluster_endpoint
   depends_on = [
     talos_machine_bootstrap.this
   ]
