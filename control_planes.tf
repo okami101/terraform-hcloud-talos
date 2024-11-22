@@ -7,7 +7,7 @@ module "control_planes" {
   location      = each.value.location
   hcloud_firewall_ids = [
     hcloud_firewall.talos.id,
-    hcloud_firewall.control_planes.id
+    hcloud_firewall.kube.id
   ]
   hcloud_network_id = hcloud_network.kube.id
   private_ipv4      = each.value.private_ipv4
