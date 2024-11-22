@@ -37,11 +37,11 @@ resource "hcloud_network_subnet" "control_plane" {
 }
 
 resource "hcloud_network_subnet" "agent" {
-  count        = length(var.agent_nodepools)
+  for_each     = { for i, s in local.agents : s.name => s }
   network_id   = hcloud_network.kube.id
   type         = "cloud"
   network_zone = var.network_zone
-  ip_range     = local.network_ipv4_subnets[count.index]
+  ip_range     = local.network_ipv4_subnets[i]
 }
 
 resource "hcloud_firewall" "workers" {
