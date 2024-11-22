@@ -16,6 +16,7 @@ data "talos_machine_configuration" "this" {
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   docs               = false
   examples           = false
+  config_patches     = [yamlencode(local.config_patches[each.value.machine_type])]
 }
 
 data "talos_client_configuration" "this" {
