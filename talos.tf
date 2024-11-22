@@ -30,6 +30,12 @@ locals {
         resolveMemberNames   = true
       }
     }
+    provisioning = {
+      diskSelector = {
+        match = "disk.model == 'Volume'"
+      }
+      grow = true
+    }
   }
 
   cluster_common_config = {
