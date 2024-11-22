@@ -24,7 +24,6 @@ resource "hcloud_server" "server" {
   user_data = var.user_data
   lifecycle {
     ignore_changes = [
-      firewall_ids,
       user_data,
       image
     ]
