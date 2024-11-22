@@ -100,6 +100,8 @@ locals {
           hcloud_network_subnet.agent[[
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
+        labels      = s.labels != null ? s.labels : {}
+        taints      = s.taints != null ? s.taints : {}
         volume_size = s.volume_size != null ? s.volume_size : 0
         config_patches = [yamlencode(
           {

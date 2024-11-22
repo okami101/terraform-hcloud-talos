@@ -36,8 +36,8 @@ resource "talos_machine_configuration_apply" "this" {
   endpoint                    = local.cluster_endpoint
   config_patches = [yamlencode({
     machine = {
-      nodeLabels = each.value.labels != null ? each.value.labels : {}
-      nodeTaints = each.value.taints != null ? each.value.taints : {}
+      nodeLabels = each.value.labels
+      nodeTaints = each.value.taints
       disks = each.value.volume_size >= 10 ? [
         {
           device = "/dev/sdb"
