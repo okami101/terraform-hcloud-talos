@@ -32,16 +32,18 @@ locals {
     }
   }
 
-  config_patches = {
-
-    cluster_worker_config = {
-      network = {
-        cni = {
-          name = "none"
-        }
+  cluster_common_config = {
+    network = {
+      cni = {
+        name = "none"
       }
     }
-    cluster_controlplane_config = merge(local.config_patches.cluster_worker_config, {
+  }
+
+  config_patches = {
+
+    cluster_worker_config = local.cluster_common_config
+    cluster_controlplane_config = merge(local.cluster_common_config, {
       proxy = {
         disabled = true
       }
