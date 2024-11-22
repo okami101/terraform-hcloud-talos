@@ -40,8 +40,7 @@ resource "talos_machine_configuration_apply" "this" {
 
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = local.first_control_plane.private_ipv4
-  endpoint             = local.cluster_endpoint
+  node                 = local.cluster_endpoint
   depends_on = [
     talos_machine_configuration_apply.this
   ]
@@ -49,8 +48,7 @@ resource "talos_machine_bootstrap" "this" {
 
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = local.first_control_plane.private_ipv4
-  endpoint             = local.cluster_endpoint
+  node                 = local.cluster_endpoint
   depends_on = [
     talos_machine_bootstrap.this
   ]
