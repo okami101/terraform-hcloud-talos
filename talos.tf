@@ -5,7 +5,7 @@ resource "talos_machine_secrets" "this" {
 locals {
   cluster_internal_host     = "cluster.local"
   cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
-  cluster_endpoint          = var.talos_endpoint != null ? var.talos_endpoint : hcloud_server.servers[0].public_ipv4
+  cluster_endpoint          = var.talos_endpoint != null ? var.talos_endpoint : hcloud_server.servers["${var.cluster_name}-control-plane-01"].ipv4_address
 }
 
 data "talos_client_configuration" "this" {
