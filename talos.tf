@@ -6,6 +6,68 @@ locals {
   cluster_internal_host     = "cluster.local"
   cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
   first_control_plane       = values(module.control_planes)[0]
+  machine_config = {
+    install = {
+      image = "ghcr.io/siderolabs/installer:${var.talos_version}"
+    }
+    certSANs = [
+      var.cluster_domain
+    ]
+    kubelet = {
+      extraArgs = {
+        "cloud-provider"             = "external"
+        "rotate-server-certificates" = true
+      }
+    }
+    sysctls = {
+      "net.core.somaxconn"          = "65535"
+      "net.core.netdev_max_backlog" = "4096"
+    },
+    features = {
+      hostDNS = {
+        enabled              = true
+        forwardKubeDNSToHost = true
+        resolveMemberNames   = true
+      }
+    }
+  }
+
+  config_patches = {
+
+    cluster_worker_config = {
+      network = {
+        cni = {
+          name = "none"
+        }
+      }
+    }
+    cluster_controlplane_config = merge(local.config_patches.cluster_worker_config, {
+      proxy = {
+        disabled = true
+      }
+      apiServer = {
+        certSANs = [
+          var.cluster_domain
+        ]
+      }
+      controllerManager = {
+        extraArgs = {
+          "cloud-provider" = "external"
+          "bind-address"   = "0.0.0.0"
+        }
+      }
+      etcd = {
+        extraArgs = {
+          "listen-metrics-urls" = "http://0.0.0.0:2381"
+        }
+      }
+      scheduler = {
+        extraArgs = {
+          "bind-address" = "0.0.0.0"
+        }
+      }
+    })
+  }
 }
 
 data "talos_machine_configuration" "this" {
@@ -17,7 +79,13 @@ data "talos_machine_configuration" "this" {
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   docs               = false
   examples           = false
-  config_patches     = [yamlencode(local.config_patches[each.value.machine_type])]
+  config_patches = [yamlencode({
+    machine = merge(local.machine_config, {
+      nodeLabels = each.value.labels
+      nodeTaints = each.value.taints
+    })
+    cluster = local.config_patches["cluster_${each.value.machine_type}_config"]
+  })]
 }
 
 data "talos_client_configuration" "this" {
