@@ -57,7 +57,11 @@ variable "control_planes" {
     server_type = string
     location    = string
     labels      = optional(map(string))
-    taints      = optional(list(string))
+    taints = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })))
   }))
 }
 
@@ -69,7 +73,11 @@ variable "agent_nodepools" {
     location    = string
     count       = number
     labels      = optional(map(string))
-    taints      = optional(list(string))
+    taints = optional(list(object({
+      key    = string
+      value  = string
+      effect = string
+    })))
     volume_size = optional(number)
   }))
 }
