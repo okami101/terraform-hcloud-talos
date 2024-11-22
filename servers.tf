@@ -10,7 +10,7 @@ data "hcloud_image" "talos_arm_snapshot" {
   most_recent       = true
 }
 
-resource "hcloud_server" "server" {
+resource "hcloud_server" "servers" {
   for_each     = { for i, s in local.servers : s.name => s }
   name         = "${var.cluster_name}-${each.key}"
   server_type  = each.value.server_type
@@ -35,7 +35,7 @@ resource "hcloud_volume" "volumes" {
   for_each  = { for i, s in local.servers : s.name => s if s.volume_size >= 10 }
   name      = "${var.cluster_name}-${each.key}"
   size      = each.value.volume_size
-  server_id = hcloud_server.server.id
+  server_id = hcloud_server.servers[each.key].id
   automount = true
   format    = "ext4"
 }
