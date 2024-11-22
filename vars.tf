@@ -62,7 +62,7 @@ variable "control_planes" {
     name           = string
     server_type    = string
     location       = string
-    machine_config = optional(map(any))
+    machine_config = optional(any)
   }))
 }
 
@@ -74,6 +74,6 @@ variable "agent_nodepools" {
     location       = string
     count          = number
     volume_size    = optional(number)
-    machine_config = optional(map(any))
+    machine_config = optional(any)
   }))
 }
