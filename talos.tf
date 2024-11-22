@@ -34,6 +34,17 @@ resource "talos_machine_configuration_apply" "this" {
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = "${var.cluster_name}-${each.key}"
   endpoint                    = var.cluster_domain
+  config_patches = [
+    yamlencode({
+      machine = {
+        install = {
+          diskSelector = {
+            model = "Volume"
+          }
+        }
+      }
+    })
+  ]
   depends_on = [
     module.control_planes,
     module.agents
