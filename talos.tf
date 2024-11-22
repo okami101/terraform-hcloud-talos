@@ -17,7 +17,7 @@ data "talos_client_configuration" "this" {
 }
 
 data "talos_machine_configuration" "this" {
-  for_each           = { for m in concat(local.control_planes, local.agents) : m.name => m }
+  for_each           = { for m in local.servers : m.name => m }
   cluster_name       = var.cluster_name
   kubernetes_version = var.kubernetes_version
   machine_type       = each.value.machine_type
@@ -29,7 +29,7 @@ data "talos_machine_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "this" {
-  for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
+  for_each                    = { for m in local.servers : m.name => m }
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = each.value.private_ipv4
