@@ -97,21 +97,7 @@ locals {
         volume_size = s.volume_size != null ? s.volume_size : 0
         config_patches = [yamlencode(
           {
-            machine = merge(
-              local.machine_config,
-              {
-                disks = s.volume_size != null ? [
-                  {
-                    device = "/dev/sdb"
-                    partitions = [
-                      {
-                        mountpoint = "/var/mnt/longhorn"
-                      }
-                    ]
-                  }
-                ] : []
-              }
-            )
+            machine = local.machine_config
             cluster = local.config_patches["cluster_worker_config"]
           }
         )]
