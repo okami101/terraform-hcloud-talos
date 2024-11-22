@@ -5,7 +5,7 @@ module "agents" {
   talos_version       = var.talos_version
   type                = each.value.server_type
   location            = each.value.location
-  hcloud_firewall_ids = [hcloud_firewall.talos.id]
+  hcloud_firewall_ids = [hcloud_firewall.workers.id]
   hcloud_network_id   = hcloud_network.kube.id
   private_ipv4        = each.value.private_ipv4
   hcloud_volumes = each.value.volume_size >= 10 ? [
