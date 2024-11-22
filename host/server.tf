@@ -16,19 +16,18 @@ resource "hcloud_server" "server" {
   location     = var.location
   image        = substr(var.type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
   firewall_ids = var.hcloud_firewall_ids
-  lifecycle {
-    ignore_changes = [
-      firewall_ids,
-      user_data,
-      ssh_keys,
-      image
-    ]
-  }
-  user_data = var.user_data
   network {
     network_id = var.hcloud_network_id
     ip         = var.private_ipv4
     alias_ips  = []
+  }
+  user_data = var.user_data
+  lifecycle {
+    ignore_changes = [
+      firewall_ids,
+      user_data,
+      image
+    ]
   }
 }
 
