@@ -1,4 +1,4 @@
-# Terraform Hetzner Cloud K3S
+# Terraform Hetzner Cloud Talos
 
 ## 🎯 About
 

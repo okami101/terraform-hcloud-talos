@@ -62,7 +62,7 @@ variable "control_planes" {
 }
 
 variable "agent_nodepools" {
-  description = "List of all additional worker types to create for k3s cluster. Each type is identified by specific role and can have a different number of instances."
+  description = "List of all additional worker types to create for cluster. Each type is identified by specific role and can have a different number of instances."
   type = list(object({
     name        = string
     server_type = string
