@@ -37,7 +37,7 @@ resource "hcloud_network_subnet" "control_plane" {
 }
 
 resource "hcloud_network_subnet" "agent" {
-  for_each     = { for i, s in local.agents : s.name => s }
+  for_each     = { for i, s in var.agent_nodepools : s.name => s }
   network_id   = hcloud_network.kube.id
   type         = "cloud"
   network_zone = var.network_zone
