@@ -18,7 +18,7 @@ data "talos_machine_configuration" "this" {
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   docs               = false
   examples           = false
-  config_patches     = m.config_patches
+  config_patches     = each.value.config_patches
 }
 
 data "talos_client_configuration" "this" {
