@@ -8,5 +8,5 @@ module "control_planes" {
   hcloud_firewall_ids = [hcloud_firewall.k3s.id]
   hcloud_network_id   = hcloud_network.k3s.id
   private_ipv4        = each.value.private_ipv4
-  user_data           = ""
+  user_data           = data.talos_machine_configuration.this[each.value.name].machine_configuration
 }

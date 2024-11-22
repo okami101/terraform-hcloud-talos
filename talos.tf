@@ -8,7 +8,7 @@ locals {
 }
 
 data "talos_machine_configuration" "this" {
-  for_each           = { for machine in concat(local.control_planes, local.agents) : machine.name => machine }
+  for_each           = { for m in concat(local.control_planes, local.agents) : m.name => m }
   cluster_name       = var.cluster_name
   kubernetes_version = var.kubernetes_version
   machine_type       = each.value.machine_type

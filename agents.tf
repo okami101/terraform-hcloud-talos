@@ -14,5 +14,5 @@ module "agents" {
       size = each.value.volume_size
     }
   ] : []
-  user_data = ""
+  user_data = data.talos_machine_configuration.this[each.value.name].machine_configuration
 }
