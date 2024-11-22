@@ -35,6 +35,20 @@ resource "talos_machine_configuration_apply" "this" {
   node                        = each.value.private_ipv4
   endpoint                    = local.cluster_endpoint
   depends_on                  = [hcloud_server.servers]
+  config_patches = [yamlencode({
+    machine = {
+      disks = s.volume_size == null ? [] : [
+        {
+          device = "/dev/sdb"
+          partitions = [
+            {
+              mountpoint = "/var/mnt/longhorn"
+            }
+          ]
+        }
+      ]
+    }
+  })]
 }
 
 resource "talos_machine_bootstrap" "this" {
