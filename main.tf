@@ -53,12 +53,8 @@ resource "hcloud_network_subnet" "agent" {
   ip_range     = local.network_ipv4_subnets[count.index]
 }
 
-resource "hcloud_firewall" "workers" {
-  name = "${var.cluster_name}-workers"
-}
-
-resource "hcloud_firewall" "control_planes" {
-  name = "${var.cluster_name}-control-planes"
+resource "hcloud_firewall" "nodes" {
+  name = var.cluster_name
 
   dynamic "rule" {
     for_each = local.firewall_rules
