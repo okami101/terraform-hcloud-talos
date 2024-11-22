@@ -6,7 +6,14 @@ locals {
   cluster_internal_host     = "cluster.local"
   cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
   first_control_plane       = values(module.control_planes)[0]
+}
 
+data "talos_client_configuration" "this" {
+  cluster_name         = var.cluster_name
+  client_configuration = talos_machine_secrets.this.client_configuration
+  endpoints = [
+    var.cluster_domain,
+  ]
 }
 
 data "talos_machine_configuration" "this" {
@@ -21,32 +28,27 @@ data "talos_machine_configuration" "this" {
   config_patches     = each.value.config_patches
 }
 
-data "talos_client_configuration" "this" {
-  cluster_name         = var.cluster_name
-  client_configuration = talos_machine_secrets.this.client_configuration
-  endpoints = [
-    var.cluster_domain,
-  ]
-}
+# resource "talos_machine_configuration_apply" "this" {
+#   for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
+#   client_configuration        = talos_machine_secrets.this.client_configuration
+#   machine_configuration_input = data.talos_machine_configuration.this.machine_configuration
+#   node                        = each.value.key
+#   config_patches              = each.value.config_patches
+# }
 
-resource "talos_machine_bootstrap" "this" {
-  client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = local.first_control_plane.public_ipv4
-  endpoint             = local.first_control_plane.public_ipv4
-}
+# resource "talos_machine_bootstrap" "this" {
+#   client_configuration = talos_machine_secrets.this.client_configuration
+#   node                 = local.first_control_plane.public_ipv4
+#   endpoint             = local.first_control_plane.public_ipv4
+#   depends_on = [
+#     talos_machine_configuration_apply.this
+#   ]
+# }
 
-resource "talos_cluster_kubeconfig" "this" {
-  client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = local.first_control_plane.public_ipv4
-  depends_on = [
-    talos_machine_bootstrap.this
-  ]
-}
-
-resource "talos_machine_configuration_apply" "this" {
-  for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
-  client_configuration        = talos_machine_secrets.this.client_configuration
-  machine_configuration_input = data.talos_machine_configuration.this.machine_configuration
-  node                        = each.value.key
-  config_patches              = each.value.config_patches
-}
+# resource "talos_cluster_kubeconfig" "this" {
+#   client_configuration = talos_machine_secrets.this.client_configuration
+#   node                 = local.first_control_plane.public_ipv4
+#   depends_on = [
+#     talos_machine_bootstrap.this
+#   ]
+# }
