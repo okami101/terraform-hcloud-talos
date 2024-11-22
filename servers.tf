@@ -1,18 +1,41 @@
-module "servers" {
-  for_each            = { for i, s in local.servers : s.name => s }
-  source              = "./host"
-  name                = "${var.cluster_name}-${each.key}"
-  talos_version       = var.talos_version
-  type                = each.value.server_type
-  location            = each.value.location
-  hcloud_firewall_ids = [each.value.firewall_id]
-  hcloud_network_id   = hcloud_network.kube.id
-  private_ipv4        = each.value.private_ipv4
-  hcloud_volumes = each.value.volume_size >= 10 ? [
-    {
-      name = "${var.cluster_name}-${each.key}"
-      size = each.value.volume_size
-    }
-  ] : []
+data "hcloud_image" "talos_x86_snapshot" {
+  with_selector     = "version=${var.talos_version}"
+  with_architecture = "x86"
+  most_recent       = true
+}
+
+data "hcloud_image" "talos_arm_snapshot" {
+  with_selector     = "version=${var.talos_version}"
+  with_architecture = "arm"
+  most_recent       = true
+}
+
+resource "hcloud_server" "server" {
+  for_each     = { for i, s in local.servers : s.name => s }
+  name         = "${var.cluster_name}-${each.key}"
+  server_type  = each.value.server_type
+  location     = each.value.location
+  image        = substr(each.value.server_type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
+  firewall_ids = [each.value.firewall_id]
+  network {
+    network_id = hcloud_network.kube.id
+    ip         = each.value.private_ipv4
+    alias_ips  = []
+  }
   user_data = data.talos_machine_configuration.this[each.value.name].machine_configuration
+  lifecycle {
+    ignore_changes = [
+      user_data,
+      image
+    ]
+  }
+}
+
+resource "hcloud_volume" "volumes" {
+  for_each  = { for i, s in local.servers : s.name => s if s.volume_size >= 10 }
+  name      = "${var.cluster_name}-${each.key}"
+  size      = each.value.volume_size
+  server_id = hcloud_server.server.id
+  automount = true
+  format    = "ext4"
 }
