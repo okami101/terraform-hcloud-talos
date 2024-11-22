@@ -75,6 +75,7 @@ locals {
       private_ipv4 = cidrhost(
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
+      volume_size = 0
       config_patches = [yamlencode({
         machine = merge(
           local.machine_config,
