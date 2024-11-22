@@ -1,9 +1,9 @@
-output "talos_config" {
+output "talosconfig" {
   value     = data.talos_client_configuration.this.talos_config
   sensitive = true
 }
 
-output "kube_config" {
+output "kubeconfig" {
   value     = talos_cluster_kubeconfig.this.kubeconfig_raw
   sensitive = true
 }
