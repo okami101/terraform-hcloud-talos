@@ -37,7 +37,7 @@ resource "talos_machine_configuration_apply" "this" {
   depends_on                  = [hcloud_server.servers]
   config_patches = [yamlencode({
     machine = {
-      disks = s.volume_size == null ? [] : [
+      disks = each.value.volume_size >= 10 ? [
         {
           device = "/dev/sdb"
           partitions = [
@@ -46,7 +46,7 @@ resource "talos_machine_configuration_apply" "this" {
             }
           ]
         }
-      ]
+      ] : []
     }
   })]
 }
