@@ -25,12 +25,11 @@ resource "hcloud_server" "server" {
     ]
   }
   user_data = var.user_data
-}
-
-resource "hcloud_server_network" "server" {
-  ip         = var.private_ipv4
-  server_id  = hcloud_server.server.id
-  network_id = var.hcloud_network_id
+  network {
+    network_id = var.hcloud_network_id
+    ip         = var.private_ipv4
+    alias_ips  = []
+  }
 }
 
 resource "hcloud_volume" "volumes" {
