@@ -20,15 +20,6 @@ locals {
         port        = "50000"
         source_ips  = var.firewall_talos_api_source
       }
-    ],
-    [
-      {
-        description = "Allow Incoming ICMP Ping Requests"
-        direction   = "in"
-        protocol    = "icmp"
-        port        = ""
-        source_ips  = ["0.0.0.0/0", "::/0"]
-      }
     ]
   )
 }
@@ -53,8 +44,12 @@ resource "hcloud_network_subnet" "agent" {
   ip_range     = local.network_ipv4_subnets[count.index]
 }
 
-resource "hcloud_firewall" "nodes" {
-  name = var.cluster_name
+resource "hcloud_firewall" "workers" {
+  name = "${var.cluster_name}-workers"
+}
+
+resource "hcloud_firewall" "control_planes" {
+  name = "${var.cluster_name}-control-planes"
 
   dynamic "rule" {
     for_each = local.firewall_rules
