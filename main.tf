@@ -2,35 +2,15 @@ locals {
   network_ipv4_subnets = [
     for index in range(256) : cidrsubnet(var.network_ipv4_cidr, 8, index)
   ]
-  firewall_rules = concat(
-    var.firewall_talos_api_source == null ? [] : [
-      {
-        description = "Allow Incoming Talos API Traffic"
-        direction   = "in"
-        protocol    = "tcp"
-        port        = "50000"
-        source_ips  = var.firewall_talos_api_source
-      },
-    ],
-    var.firewall_kube_api_source == null ? [] : [
-      {
-        description = "Allow Incoming Requests to Kube API Server"
-        direction   = "in"
-        protocol    = "tcp"
-        port        = "6443"
-        source_ips  = var.firewall_kube_api_source
-      }
-    ],
-    [
-      {
-        description = "Allow Incoming ICMP Ping Requests"
-        direction   = "in"
-        protocol    = "icmp"
-        port        = ""
-        source_ips  = ["0.0.0.0/0", "::/0"]
-      }
-    ]
-  )
+  firewall_common_rules = [
+    {
+      description = "Allow Incoming ICMP Ping Requests"
+      direction   = "in"
+      protocol    = "icmp"
+      port        = ""
+      source_ips  = ["0.0.0.0/0", "::/0"]
+    }
+  ]
 }
 
 resource "hcloud_network" "kube" {
@@ -54,10 +34,47 @@ resource "hcloud_network_subnet" "agent" {
 }
 
 resource "hcloud_firewall" "kube" {
-  name = var.cluster_name
+  name = "${var.cluster_name}-kube"
 
   dynamic "rule" {
-    for_each = local.firewall_rules
+    for_each = concat(
+      local.firewall_common_rules,
+      var.firewall_kube_api_source == null ? [] : [
+        {
+          description = "Allow Incoming Requests to Kube API Server"
+          direction   = "in"
+          protocol    = "tcp"
+          port        = "6443"
+          source_ips  = var.firewall_kube_api_source
+        },
+      ],
+    )
+    content {
+      description = rule.value.description
+      direction   = rule.value.direction
+      protocol    = rule.value.protocol
+      port        = rule.value.port
+      source_ips  = rule.value.source_ips
+    }
+  }
+}
+
+resource "hcloud_firewall" "talos" {
+  name = "${var.cluster_name}-talos"
+
+  dynamic "rule" {
+    for_each = concat(
+      local.firewall_common_rules,
+      var.firewall_talos_api_source == null ? [] : [
+        {
+          description = "Allow Incoming Talos API Traffic"
+          direction   = "in"
+          protocol    = "tcp"
+          port        = "50000"
+          source_ips  = var.firewall_talos_api_source
+        },
+      ]
+    )
     content {
       description = rule.value.description
       direction   = rule.value.direction
