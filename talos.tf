@@ -34,6 +34,9 @@ resource "talos_machine_configuration_apply" "this" {
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = each.value.private_ipv4
   endpoint                    = local.cluster_endpoint
+  config_patches = [yamlencode({
+    machine = each.value.machine_config
+  })]
   depends_on = [
     hcloud_server.servers,
     hcloud_volume.volumes,

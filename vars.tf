@@ -59,19 +59,21 @@ variable "firewall_talos_api_source" {
 variable "control_planes" {
   description = "List of control planes"
   type = list(object({
-    name        = string
-    server_type = string
-    location    = string
+    name           = string
+    server_type    = string
+    location       = string
+    machine_config = optional(map(any))
   }))
 }
 
 variable "agent_nodepools" {
   description = "List of all additional worker types to create for cluster. Each type is identified by specific role and can have a different number of instances."
   type = list(object({
-    name        = string
-    server_type = string
-    location    = string
-    count       = number
-    volume_size = optional(number)
+    name           = string
+    server_type    = string
+    location       = string
+    count          = number
+    volume_size    = optional(number)
+    machine_config = optional(map(any))
   }))
 }

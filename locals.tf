@@ -80,6 +80,7 @@ locals {
         machine = local.machine_config
         cluster = local.config_patches["cluster_controlplane_config"]
       })]
+      machine_config = s.machine_config != null ? s.machine_config : {}
     }
   ]
   agents = flatten([
@@ -101,6 +102,7 @@ locals {
             cluster = local.config_patches["cluster_worker_config"]
           }
         )]
+        machine_config = s.machine_config != null ? s.machine_config : {}
       }
     ]
   ])
