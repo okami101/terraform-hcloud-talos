@@ -32,7 +32,7 @@ resource "talos_machine_configuration_apply" "this" {
   for_each                    = { for m in concat(local.control_planes, local.agents) : m.name => m }
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
-  node                        = each.key
+  node                        = "${var.cluster_name}-${each.key}"
   endpoint                    = var.cluster_domain
 }
 
