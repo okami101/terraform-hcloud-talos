@@ -75,10 +75,13 @@ locals {
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
       config_patches = [yamlencode({
-        machine = merge(local.machine_config, {
-          nodeLabels = s.labels != null ? s.labels : {}
-          nodeTaints = s.taints != null ? s.taints : {}
-        })
+        machine = merge(
+          local.machine_config,
+          {
+            nodeLabels = s.labels != null ? s.labels : {}
+            nodeTaints = s.taints != null ? s.taints : {}
+          }
+        )
         cluster = local.config_patches["cluster_controlplane_config"]
       })]
     }
@@ -95,13 +98,25 @@ locals {
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
         volume_size = s.volume_size != null ? s.volume_size : 0
-        config_patches = [yamlencode({
-          machine = merge(local.machine_config, {
-            nodeLabels = s.labels != null ? s.labels : {}
-            nodeTaints = s.taints != null ? s.taints : {}
-          })
-          cluster = local.config_patches["cluster_worker_config"]
-        })]
+        config_patches = [yamlencode(
+          {
+            machine = merge(local.machine_config, {
+              nodeLabels = s.labels != null ? s.labels : {}
+              nodeTaints = s.taints != null ? s.taints : {}
+              disks = s.volume_size == null ? [] : [
+                {
+                  device = "/dev/sdb"
+                  partitions = [
+                    {
+                      mountpoint = "/var/mnt/longhorn"
+                    }
+                  ]
+                }
+              ]
+            })
+            cluster = local.config_patches["cluster_worker_config"]
+          }
+        )]
       }
     ]
   ])
