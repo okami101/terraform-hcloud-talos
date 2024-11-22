@@ -35,7 +35,13 @@ resource "talos_machine_configuration_apply" "this" {
   node                        = each.value.private_ipv4
   endpoint                    = local.cluster_endpoint
   config_patches = [yamlencode({
-    machine = each.value.machine_configsd
+    machine = {
+      disks = {
+        "/dev/sda" = {
+          size = each.value.volume_size
+        }
+      }
+    }
   })]
   depends_on = [
     hcloud_server.servers,
