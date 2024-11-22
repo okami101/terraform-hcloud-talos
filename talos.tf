@@ -3,8 +3,9 @@ resource "talos_machine_secrets" "this" {
 }
 
 locals {
-  cluster_endpoint    = "https://cluster.local:6443"
-  first_control_plane = values(module.control_planes)[0]
+  cluster_internal_host     = "cluster.local"
+  cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
+  first_control_plane       = values(module.control_planes)[0]
 }
 
 data "talos_machine_configuration" "this" {
@@ -12,7 +13,7 @@ data "talos_machine_configuration" "this" {
   cluster_name       = var.cluster_name
   kubernetes_version = var.kubernetes_version
   machine_type       = each.value.machine_type
-  cluster_endpoint   = local.cluster_endpoint
+  cluster_endpoint   = local.cluster_internal_endpoint
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   docs               = false
   examples           = false
@@ -22,7 +23,9 @@ data "talos_machine_configuration" "this" {
 data "talos_client_configuration" "this" {
   cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
-  endpoints            = var.talos_client_endpoints
+  endpoints = [
+    var.cluster_domain,
+  ]
 }
 
 resource "talos_machine_bootstrap" "this" {

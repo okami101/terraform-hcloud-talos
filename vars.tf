@@ -8,15 +8,16 @@ variable "kubernetes_version" {
   type        = string
 }
 
-variable "talos_client_endpoints" {
-  description = "The endpoints to use for the talos client"
-  type        = list(string)
-}
-
 variable "cluster_name" {
   description = "The cluster name, will be used in the node name, in the form of {cluster_name}-{nodepool_name}"
   type        = string
   default     = "talos"
+}
+
+variable "cluster_domain" {
+  description = "The domain name of the cluster"
+  type        = string
+  default     = "cluster.local"
 }
 
 variable "network_zone" {
