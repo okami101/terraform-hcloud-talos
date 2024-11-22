@@ -1,3 +1,8 @@
+variable "talos_version" {
+  description = "The version of talos to use"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "The cluster name, will be used in the node name, in the form of {cluster_name}-{nodepool_name}"
   type        = string
@@ -40,6 +45,8 @@ variable "control_planes" {
     name        = string
     server_type = string
     location    = string
+    labels      = list(string)
+    taints      = list(string)
   }))
 }
 
@@ -50,6 +57,8 @@ variable "agent_nodepools" {
     server_type = string
     location    = string
     count       = number
+    labels      = list(string)
+    taints      = list(string)
     volume_size = optional(number)
   }))
 }

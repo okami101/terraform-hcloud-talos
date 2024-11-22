@@ -8,6 +8,11 @@ variable "type" {
   type        = string
 }
 
+variable "talos_version" {
+  description = "The version of talos to use"
+  type        = string
+}
+
 variable "name" {
   description = "The name to use for the servers"
   type        = string
@@ -27,6 +32,11 @@ variable "private_ipv4" {
 variable "hcloud_network_id" {
   description = "The network ID to use for the server"
   type        = number
+}
+
+variable "user_data" {
+  description = "The user data to use to initialize the server"
+  type        = string
 }
 
 variable "hcloud_volumes" {

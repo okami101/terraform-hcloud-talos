@@ -2,6 +2,7 @@ module "agents" {
   for_each            = { for i, s in local.agents : s.name => s }
   source              = "./host"
   name                = "${var.cluster_name}-${each.key}"
+  talos_version       = var.talos_version
   type                = each.value.server_type
   location            = each.value.location
   hcloud_firewall_ids = [hcloud_firewall.k3s.id]
@@ -13,4 +14,5 @@ module "agents" {
       size = each.value.volume_size
     }
   ] : []
+  user_data = ""
 }

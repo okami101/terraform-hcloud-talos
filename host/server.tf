@@ -1,11 +1,11 @@
 data "hcloud_image" "talos_x86_snapshot" {
-  with_selector     = "os=talos"
+  with_selector     = "version=${var.talos_version}"
   with_architecture = "x86"
   most_recent       = true
 }
 
 data "hcloud_image" "talos_arm_snapshot" {
-  with_selector     = "os=talos"
+  with_selector     = "version=${var.talos_version}"
   with_architecture = "arm"
   most_recent       = true
 }
@@ -24,6 +24,7 @@ resource "hcloud_server" "server" {
       image
     ]
   }
+  user_data = var.user_data
 }
 
 resource "hcloud_server_network" "server" {
