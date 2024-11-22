@@ -33,6 +33,9 @@ resource "talos_machine_configuration_apply" "this" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = each.key
+  endpoint = [
+    var.cluster_domain,
+  ]
 }
 
 resource "talos_machine_bootstrap" "this" {
