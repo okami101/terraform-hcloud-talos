@@ -25,13 +25,13 @@ data "talos_client_configuration" "this" {
 
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = module.control_planes[0].public_ipv4
+  node                 = values(module.control_planes)[0].public_ipv4
   endpoint             = module.control_planes[0].public_ipv4
 }
 
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
-  node                 = module.control_planes[0].public_ipv4
+  node                 = values(module.control_planes)[0].public_ipv4
   depends_on = [
     talos_machine_bootstrap.this
   ]
