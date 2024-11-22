@@ -6,72 +6,7 @@ locals {
   cluster_internal_host     = "cluster.local"
   cluster_internal_endpoint = "https://${local.cluster_internal_host}:6443"
   first_control_plane       = values(module.control_planes)[0]
-  machine_config = {
-    install = {
-      image = "ghcr.io/siderolabs/installer:${var.talos_version}"
-    }
-    certSANs = [
-      var.cluster_domain
-    ]
-    kubelet = {
-      extraArgs = {
-        "cloud-provider"             = "external"
-        "rotate-server-certificates" = true
-      }
-    }
-    sysctls = {
-      "net.core.somaxconn"          = "65535"
-      "net.core.netdev_max_backlog" = "4096"
-    },
-    features = {
-      hostDNS = {
-        enabled              = true
-        forwardKubeDNSToHost = true
-        resolveMemberNames   = true
-      }
-    }
-  }
 
-  cluster_common_config = {
-    network = {
-      cni = {
-        name = "none"
-      }
-    }
-  }
-
-  config_patches = {
-
-    cluster_worker_config = local.cluster_common_config
-    cluster_controlplane_config = merge(local.cluster_common_config, {
-      proxy = {
-        disabled = true
-      }
-      apiServer = {
-        certSANs = [
-          var.cluster_domain
-        ]
-      }
-      controllerManager = {
-        extraArgs = {
-          "bind-address" = "0.0.0.0"
-        }
-      }
-      etcd = {
-        extraArgs = {
-          "listen-metrics-urls" = "http://0.0.0.0:2381"
-        }
-      }
-      scheduler = {
-        extraArgs = {
-          "bind-address" = "0.0.0.0"
-        }
-      }
-      externalCloudProvider = {
-        enabled = true
-      }
-    })
-  }
 }
 
 data "talos_machine_configuration" "this" {
@@ -83,13 +18,7 @@ data "talos_machine_configuration" "this" {
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   docs               = false
   examples           = false
-  config_patches = [yamlencode({
-    machine = merge(local.machine_config, {
-      nodeLabels = each.value.labels
-      nodeTaints = each.value.taints
-    })
-    cluster = local.config_patches["cluster_${each.value.machine_type}_config"]
-  })]
+  config_patches     = m.config_patches
 }
 
 data "talos_client_configuration" "this" {
@@ -113,3 +42,18 @@ resource "talos_cluster_kubeconfig" "this" {
     talos_machine_bootstrap.this
   ]
 }
+
+# resource "talos_machine_configuration_apply" "this" {
+#   client_configuration        = talos_machine_secrets.this.client_configuration
+#   machine_configuration_input = data.talos_machine_configuration.this.machine_configuration
+#   node                        = "10.5.0.2"
+#   config_patches = [
+#     yamlencode({
+#       machine = {
+#         install = {
+#           disk = "/dev/sdd"
+#         }
+#       }
+#     })
+#   ]
+# }
