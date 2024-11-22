@@ -3,10 +3,15 @@ variable "talos_version" {
   type        = string
 }
 
+variable "kubernetes_version" {
+  description = "The version of kubernetes to use"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "The cluster name, will be used in the node name, in the form of {cluster_name}-{nodepool_name}"
   type        = string
-  default     = "k3s"
+  default     = "talos"
 }
 
 variable "network_zone" {
