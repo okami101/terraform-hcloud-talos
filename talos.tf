@@ -30,12 +30,6 @@ locals {
         resolveMemberNames   = true
       }
     }
-    provisioning = {
-      diskSelector = {
-        match = "disk.model == 'Volume'"
-      }
-      grow = true
-    }
   }
 
   cluster_common_config = {
@@ -60,8 +54,7 @@ locals {
       }
       controllerManager = {
         extraArgs = {
-          "cloud-provider" = "external"
-          "bind-address"   = "0.0.0.0"
+          "bind-address" = "0.0.0.0"
         }
       }
       etcd = {
@@ -73,6 +66,9 @@ locals {
         extraArgs = {
           "bind-address" = "0.0.0.0"
         }
+      }
+      externalCloudProvider = {
+        enabled = true
       }
     })
   }
