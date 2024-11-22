@@ -8,8 +8,6 @@ locals {
       private_ipv4 = cidrhost(
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
-      labels = s.labels
-      taints = s.taints
     }
   ]
   agents = flatten([
@@ -22,8 +20,6 @@ locals {
           hcloud_network_subnet.agent[[
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
-        labels      = s.labels
-        taints      = s.taints
         volume_size = s.volume_size != null ? s.volume_size : 0
       }
     ]
