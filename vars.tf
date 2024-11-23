@@ -62,6 +62,8 @@ variable "control_planes" {
     name        = string
     server_type = string
     location    = string
+    labels      = optional(map(string))
+    taints      = optional(map(string))
   }))
 }
 
