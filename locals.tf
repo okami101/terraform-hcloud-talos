@@ -12,6 +12,11 @@ locals {
         "rotate-server-certificates" = true
       }
     }
+    kubespan = {
+      enabled                     = true
+      advertiseKubernetesNetworks = false
+      mtu                         = 1370
+    }
     sysctls = {
       "net.core.somaxconn"          = "65535"
       "net.core.netdev_max_backlog" = "4096"
