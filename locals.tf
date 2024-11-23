@@ -77,7 +77,10 @@ locals {
       )
       volume_size = 0
       config_patches = [yamlencode({
-        machine = local.machine_config
+        machine = merge(
+          local.machine_config,
+          s.machine_config != null ? s.machine_config : {}
+        )
         cluster = local.config_patches["cluster_controlplane_config"]
       })]
       machine_config = s.machine_config != null ? s.machine_config : {}
@@ -98,11 +101,13 @@ locals {
         volume_size = s.volume_size != null ? s.volume_size : 0
         config_patches = [yamlencode(
           {
-            machine = local.machine_config
+            machine = merge(
+              local.machine_config,
+              s.machine_config != null ? s.machine_config : {}
+            )
             cluster = local.config_patches["cluster_worker_config"]
           }
         )]
-        machine_config = s.machine_config != null ? s.machine_config : {}
       }
     ]
   ])
