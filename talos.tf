@@ -34,22 +34,7 @@ resource "talos_machine_configuration_apply" "this" {
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   node                        = each.value.private_ipv4
   endpoint                    = local.cluster_endpoint
-  config_patches = [yamlencode({
-    machine = {
-      nodeLabels = each.value.labels != null ? each.value.labels : {}
-      nodeTaints = each.value.taints != null ? each.value.taints : {}
-      disks = each.value.volume_size >= 10 ? [
-        {
-          device = "/dev/sdb"
-          partitions = [
-            {
-              mountpoint = "/var/mnt/longhorn"
-            }
-          ]
-        }
-      ] : []
-    }
-  })]
+  config_patches              = each.value.config_patches
   depends_on = [
     time_sleep.wait_for_volumes
   ]
