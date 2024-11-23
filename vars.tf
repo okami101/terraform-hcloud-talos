@@ -72,6 +72,8 @@ variable "agent_nodepools" {
     server_type = string
     location    = string
     count       = number
+    labels      = optional(map(string))
+    taints      = optional(map(string))
     volume_size = optional(number)
   }))
 }
