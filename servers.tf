@@ -39,3 +39,9 @@ resource "hcloud_volume" "volumes" {
   automount = true
   format    = "ext4"
 }
+
+resource "time_sleep" "wait_1_minute" {
+  depends_on = [hcloud_volume.volumes]
+
+  create_duration = "60s"
+}
