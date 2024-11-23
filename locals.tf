@@ -77,7 +77,7 @@ locals {
       )
       volume_size    = 0
       config_patches = s.config_patches != null ? s.config_patches : []
-      config_patches = [yamlencode({
+      init_config_patches = [yamlencode({
         machine = local.machine_config
         cluster = local.config_patches["cluster_controlplane_config"]
       })]
@@ -97,7 +97,7 @@ locals {
         ].ip_range, j + 101)
         volume_size    = s.volume_size != null ? s.volume_size : 0
         config_patches = s.config_patches != null ? s.config_patches : []
-        config_patches = [yamlencode(
+        init_config_patches = [yamlencode(
           {
             machine = local.machine_config
             cluster = local.config_patches["cluster_worker_config"]
