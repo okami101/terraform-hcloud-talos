@@ -76,6 +76,8 @@ locals {
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
       volume_size = 0
+      labels      = s.labels
+      taints      = s.taints
       config_patches = [yamlencode({
         machine = local.machine_config
         cluster = local.config_patches["cluster_controlplane_config"]
@@ -95,6 +97,8 @@ locals {
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
         volume_size = s.volume_size != null ? s.volume_size : 0
+        labels      = s.labels
+        taints      = s.taints
         config_patches = [yamlencode(
           {
             machine = local.machine_config
