@@ -14,6 +14,9 @@ data "talos_client_configuration" "this" {
   endpoints = [
     var.cluster_domain,
   ]
+  nodes = [
+    for s in local.servers : s.private_ipv4
+  ]
 }
 
 data "talos_machine_configuration" "this" {
