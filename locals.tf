@@ -103,7 +103,14 @@ locals {
           {
             machine = merge(
               local.machine_config,
-              s.machine_config != null ? s.machine_config : {}
+              s.machine_config != null ? {
+                device = "/dev/sdb"
+                partitions = [
+                  {
+                    mountpoint = "/var/mnt/longhorn"
+                  }
+                ]
+              } : {}
             )
             cluster = local.config_patches["cluster_worker_config"]
           }
