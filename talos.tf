@@ -49,7 +49,7 @@ resource "talos_machine_configuration_apply" "this" {
     }
   })]
   depends_on = [
-    time_sleep.wait_1_minute
+    time_sleep.wait_for_volumes
   ]
 }
 

@@ -40,8 +40,8 @@ resource "hcloud_volume" "volumes" {
   format    = "ext4"
 }
 
-resource "time_sleep" "wait_1_minute" {
+resource "time_sleep" "wait_for_volumes" {
   depends_on = [hcloud_volume.volumes]
 
-  create_duration = "60s"
+  create_duration = "10s"
 }
