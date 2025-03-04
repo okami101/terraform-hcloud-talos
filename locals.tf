@@ -103,7 +103,7 @@ locals {
           hcloud_network_subnet.agent[[
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
-        placement_group_id = s.placement_group != null ? hcloud_placement_group.talos[s.placement_group].id : s.name
+        placement_group_id = s.placement_group != null ? hcloud_placement_group.talos[s.placement_group].id : null
         volume_size        = s.volume_size != null ? s.volume_size : 0
         config_patches     = s.config_patches != null ? s.config_patches : []
         init_config_patches = [yamlencode(
