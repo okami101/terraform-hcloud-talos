@@ -8,7 +8,7 @@ This opinionated Terraform template will generate a ready-to-go cloud infrastruc
 
 ## 🚀 Quick start
 
-A valid MicroOS snapshot, identified by the selector `os=talos` must be available in your Hetzner Cloud account. Follow the [official guide](https://www.talos.dev/v1.8/talos-guides/install/cloud-platforms/hetzner/) to generate one. The latest snapshot will be automatically selected by default.
+A valid Talos snapshot, identified by the selector `os=talos` must be available in your Hetzner Cloud account. Follow the [official guide](https://www.talos.dev/v1.8/talos-guides/install/cloud-platforms/hetzner/) to generate one. The latest snapshot will be automatically selected by default.
 
 ## 📝 License
 
