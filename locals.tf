@@ -74,7 +74,7 @@ locals {
   }
   control_planes = [
     for i, s in var.control_planes : {
-      name         = "${s.name}-${format("%02d", i + 1)}"
+      name         = s.name
       server_type  = s.server_type
       location     = s.location
       machine_type = "controlplane"
