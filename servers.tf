@@ -11,14 +11,15 @@ data "hcloud_image" "talos_arm_snapshot" {
 }
 
 resource "hcloud_server" "servers" {
-  for_each     = { for i, s in local.servers : s.name => s }
-  name         = "${var.cluster_name}-${each.key}"
-  server_type  = each.value.server_type
-  location     = each.value.location
-  image        = substr(each.value.server_type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
-  firewall_ids = [each.value.firewall_id]
+  for_each           = { for i, s in local.servers : s.name => s }
+  name               = "${var.cluster_name}-${each.key}"
+  server_type        = each.value.server_type
+  location           = each.value.location
+  image              = substr(each.value.server_type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
+  placement_group_id = each.value.placement_group_id
+  firewall_ids       = [each.value.firewall_id]
   network {
-    network_id = hcloud_network.kube.id
+    network_id = hcloud_network.talos.id
     ip         = each.value.private_ipv4
     alias_ips  = []
   }

@@ -24,13 +24,13 @@ locals {
   )
 }
 
-resource "hcloud_network" "kube" {
+resource "hcloud_network" "talos" {
   name     = var.cluster_name
   ip_range = var.network_ipv4_cidr
 }
 
 resource "hcloud_network_subnet" "control_plane" {
-  network_id   = hcloud_network.kube.id
+  network_id   = hcloud_network.talos.id
   type         = "cloud"
   network_zone = var.network_zone
   ip_range     = local.network_ipv4_subnets[255]
@@ -38,7 +38,7 @@ resource "hcloud_network_subnet" "control_plane" {
 
 resource "hcloud_network_subnet" "agent" {
   count        = length(var.agent_nodepools)
-  network_id   = hcloud_network.kube.id
+  network_id   = hcloud_network.talos.id
   type         = "cloud"
   network_zone = var.network_zone
   ip_range     = local.network_ipv4_subnets[count.index]
@@ -61,4 +61,14 @@ resource "hcloud_firewall" "control_planes" {
       source_ips  = rule.value.source_ips
     }
   }
+}
+
+resource "hcloud_placement_group" "talos" {
+  for_each = { for pg in concat([
+    for s in var.control_planes : s.placement_group if s.placement_group != null
+    ], [
+    for s in var.agent_nodepools : s.placement_group if s.placement_group != null
+  ]) : pg => pg }
+  name = "${var.cluster_name}-${each.value}"
+  type = "spread"
 }

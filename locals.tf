@@ -82,8 +82,9 @@ locals {
       private_ipv4 = cidrhost(
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
-      volume_size    = 0
-      config_patches = s.config_patches != null ? s.config_patches : []
+      placement_group_id = s.placement_group != null ? hcloud_placement_group.talos[s.placement_group].id : null
+      volume_size        = 0
+      config_patches     = s.config_patches != null ? s.config_patches : []
       init_config_patches = [yamlencode({
         machine = local.machine_config
         cluster = local.config_patches["cluster_controlplane_config"]
@@ -102,8 +103,9 @@ locals {
           hcloud_network_subnet.agent[[
             for i, v in var.agent_nodepools : i if v.name == s.name][0]
         ].ip_range, j + 101)
-        volume_size    = s.volume_size != null ? s.volume_size : 0
-        config_patches = s.config_patches != null ? s.config_patches : []
+        placement_group_id = s.placement_group != null ? hcloud_placement_group.talos[s.placement_group].id : null
+        volume_size        = s.volume_size != null ? s.volume_size : 0
+        config_patches     = s.config_patches != null ? s.config_patches : []
         init_config_patches = [yamlencode(
           {
             machine = local.machine_config
