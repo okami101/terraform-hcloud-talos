@@ -47,7 +47,7 @@ resource "talos_machine_configuration_apply" "this" {
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = hcloud_server.servers[0].name
+  node                 = "${var.cluster_name}-${local.servers[0].name}"
   depends_on = [
     talos_machine_configuration_apply.this
   ]
@@ -56,7 +56,7 @@ resource "talos_machine_bootstrap" "this" {
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = hcloud_server.servers[0].name
+  node                 = "${var.cluster_name}-${local.servers[0].name}"
   depends_on = [
     talos_machine_bootstrap.this
   ]
