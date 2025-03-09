@@ -78,7 +78,7 @@ locals {
       server_type  = s.server_type
       location     = s.location
       machine_type = "controlplane"
-      firewall_id  = hcloud_firewall.control_planes.id
+      firewall_ids = [hcloud_firewall.talos_api.id, hcloud_firewall.kube_api.id]
       private_ipv4 = cidrhost(
         hcloud_network_subnet.control_plane.ip_range, i + 101
       )
@@ -98,7 +98,7 @@ locals {
         server_type  = s.server_type
         location     = s.location
         machine_type = "worker"
-        firewall_id  = hcloud_firewall.workers.id
+        firewall_ids = [hcloud_firewall.talos_api.id]
         private_ipv4 = cidrhost(
           hcloud_network_subnet.agent[[
             for i, v in var.agent_nodepools : i if v.name == s.name][0]

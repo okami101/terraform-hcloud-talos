@@ -2,26 +2,24 @@ locals {
   network_ipv4_subnets = [
     for index in range(256) : cidrsubnet(var.network_ipv4_cidr, 8, index)
   ]
-  firewall_rules = concat(
-    var.firewall_kube_api_source == null ? [] : [
-      {
-        description = "Allow Incoming Requests to Kube API Server"
-        direction   = "in"
-        protocol    = "tcp"
-        port        = "6443"
-        source_ips  = var.firewall_kube_api_source
-      },
-    ],
-    var.firewall_talos_api_source == null ? [] : [
-      {
-        description = "Allow Incoming Talos API Traffic"
-        direction   = "in"
-        protocol    = "tcp"
-        port        = "50000"
-        source_ips  = var.firewall_talos_api_source
-      }
-    ]
-  )
+  firewall_kube_api_source = var.firewall_kube_api_source == null ? [] : [
+    {
+      description = "Allow Incoming Requests to Kube API Server"
+      direction   = "in"
+      protocol    = "tcp"
+      port        = "6443"
+      source_ips  = var.firewall_kube_api_source
+    },
+  ]
+  firewall_talos_api_source = var.firewall_talos_api_source == null ? [] : [
+    {
+      description = "Allow Incoming Talos API Traffic"
+      direction   = "in"
+      protocol    = "tcp"
+      port        = "50000"
+      source_ips  = var.firewall_talos_api_source
+    }
+  ]
 }
 
 resource "hcloud_network" "talos" {
@@ -44,15 +42,26 @@ resource "hcloud_network_subnet" "agent" {
   ip_range     = local.network_ipv4_subnets[count.index]
 }
 
-resource "hcloud_firewall" "workers" {
-  name = "${var.cluster_name}-workers"
-}
-
-resource "hcloud_firewall" "control_planes" {
-  name = "${var.cluster_name}-control-planes"
+resource "hcloud_firewall" "talos_api" {
+  name = "${var.cluster_name}-talos-api"
 
   dynamic "rule" {
-    for_each = local.firewall_rules
+    for_each = local.firewall_talos_api_source
+    content {
+      description = rule.value.description
+      direction   = rule.value.direction
+      protocol    = rule.value.protocol
+      port        = rule.value.port
+      source_ips  = rule.value.source_ips
+    }
+  }
+}
+
+resource "hcloud_firewall" "kube_api" {
+  name = "${var.cluster_name}-kube-api"
+
+  dynamic "rule" {
+    for_each = local.firewall_kube_api_source
     content {
       description = rule.value.description
       direction   = rule.value.direction

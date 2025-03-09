@@ -17,7 +17,7 @@ resource "hcloud_server" "servers" {
   location           = each.value.location
   image              = substr(each.value.server_type, 0, 3) == "cax" ? data.hcloud_image.talos_arm_snapshot.id : data.hcloud_image.talos_x86_snapshot.id
   placement_group_id = each.value.placement_group_id
-  firewall_ids       = [each.value.firewall_id]
+  firewall_ids       = each.value.firewall_ids
   network {
     network_id = hcloud_network.talos.id
     ip         = each.value.private_ipv4
