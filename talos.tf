@@ -15,7 +15,7 @@ data "talos_client_configuration" "this" {
     var.cluster_domain,
   ]
   nodes = [
-    for s in local.servers : s.private_ipv4
+    for s in local.servers : s.name
   ]
 }
 
@@ -33,11 +33,11 @@ data "talos_machine_configuration" "this" {
 }
 
 resource "talos_machine_configuration_apply" "this" {
-  for_each                    = { for m in local.servers : m.name => m }
+  for_each                    = { for s in local.servers : s.name => s }
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   endpoint                    = local.cluster_endpoint
-  node                        = each.value.private_ipv4
+  node                        = each.key
   config_patches              = each.value.config_patches
   depends_on = [
     time_sleep.wait_for_volumes
@@ -47,7 +47,7 @@ resource "talos_machine_configuration_apply" "this" {
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = local.servers[0].private_ipv4
+  node                 = local.servers[0].name
   depends_on = [
     talos_machine_configuration_apply.this
   ]
@@ -56,7 +56,7 @@ resource "talos_machine_bootstrap" "this" {
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = local.servers[0].private_ipv4
+  node                 = local.servers[0].name
   depends_on = [
     talos_machine_bootstrap.this
   ]
