@@ -7,6 +7,11 @@ locals {
       var.cluster_domain
     ]
     kubelet = {
+      nodeIP = {
+        validSubnets = [
+          var.network_ipv4_cidr
+        ]
+      }
       extraArgs = {
         "cloud-provider"             = "external"
         "rotate-server-certificates" = true
@@ -58,6 +63,9 @@ locals {
         }
       }
       etcd = {
+        advertisedSubnets = [
+          var.network_ipv4_cidr
+        ]
         extraArgs = {
           "listen-metrics-urls" = "http://0.0.0.0:2381"
         }
