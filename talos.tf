@@ -15,7 +15,7 @@ data "talos_client_configuration" "this" {
     var.cluster_domain,
   ]
   nodes = [
-    for s in local.servers : s.name
+    for s in hcloud_server.servers : s.name
   ]
 }
 
@@ -37,7 +37,7 @@ resource "talos_machine_configuration_apply" "this" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.value.name].machine_configuration
   endpoint                    = local.cluster_endpoint
-  node                        = each.key
+  node                        = "${var.cluster_name}-${each.key}"
   config_patches              = each.value.config_patches
   depends_on = [
     time_sleep.wait_for_volumes
@@ -47,7 +47,7 @@ resource "talos_machine_configuration_apply" "this" {
 resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = local.servers[0].name
+  node                 = hcloud_server.servers[0].name
   depends_on = [
     talos_machine_configuration_apply.this
   ]
@@ -56,7 +56,7 @@ resource "talos_machine_bootstrap" "this" {
 resource "talos_cluster_kubeconfig" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
   endpoint             = local.cluster_endpoint
-  node                 = local.servers[0].name
+  node                 = hcloud_server.servers[0].name
   depends_on = [
     talos_machine_bootstrap.this
   ]
